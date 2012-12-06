@@ -32,9 +32,6 @@
 #include "Arduino.h"
 #include <WebSocketClient.h>
 
-//Uncomment this to use WIFLY Client
-//#define WIFLY true
-
 class PusherClient {
 
     public:

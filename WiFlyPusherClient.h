@@ -1,5 +1,5 @@
 /*
- WebsocketClient, a websocket client for Arduino
+ WiFlyPusherClient, a Pusher (http://pusherapp.com) client for Arduino
  Copyright 2011 Kevin Rohling
  http://kevinrohling.com
  
@@ -22,31 +22,38 @@
  THE SOFTWARE.
  */
 
-#ifndef WEBSOCKETCLIENT_H
-#define WEBSOCKETCLIENT_H_
+
+#ifndef PUSHERCLIENT_H
+#define PUSHERCLIENT_H_
 
 #include <string.h>
 #include <stdlib.h>
 #include <WString.h>
-#include <Ethernet.h>
 #include "Arduino.h"
+#include <WiFlyWebSocketClient.h>
 
-class WebSocketClient {
-	public:
-		typedef void (*DataArrivedDelegate)(WebSocketClient client, String data);
-		bool connect(char hostname[], char path[] = "/", int port = 80);
+class WiFlyPusherClient {
+
+    public:
+        WiFlyPusherClient();
+        typedef void (*EventDelegate)(String data);
+        bool connect(String appId);
         bool connected();
         void disconnect();
-		void monitor();
-		void setDataArrivedDelegate(DataArrivedDelegate dataArrivedDelegate);
-		void send(String data);
-	private:
-        String getStringTableItem(int index);
-        void sendHandshake(char hostname[], char path[]);
-        EthernetClient _client;
-        DataArrivedDelegate _dataArrivedDelegate;
-        bool readHandshake();
-        String readLine();
+        void monitor();
+        void bindAll(EventDelegate delegate);
+        void bind(String eventName, EventDelegate delegate);
+        void subscribe(String channel);
+        void subscribe(String channel, String auth);
+        void subscribe(String channel, String auth, String userId);
+        void triggerEvent(String eventName, String eventData);
+        void unsubscribe(String channel);
+    private:
+        String _appId;
+        static String getStringTableItem(int index);
+        WiFlyWebSocketClient _client;
+        static void dataArrived(WiFlyWebSocketClient client, String data);
+        static String parseMessageMember(String memberName, String data);
 };
 
 
